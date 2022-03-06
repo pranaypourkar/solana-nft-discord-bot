@@ -1,0 +1,24 @@
+RPC URL for Devnet: https://api.devnet.solana.com
+RPC URL for Testnet: https://api.testnet.solana.com
+RPC URL for Mainnet Beta: https://api.mainnet-beta.solana.com
+
+pollingInterval = 2000; // ms
+Polling interval for how often we want our bot to check for new sales. I recommend setting this to be somewhere between 2000–5000ms at least. This is because the default Solana RPC nodes have rate-limits and your requests won’t go through if you’re making too many calls in a short time period. You can use an RPC provider like GenesysGo to make unlimited calls, though this won’t be free
+
+
+webhook url
+right click on your server -> server settings -> integrations -> webhooks -> new webhook
+https://discord.com/api/webhooks/949013328343224380/Dd-i6KG_Ewn5ufgA8ilayAb_oFFG3MKbZQRZuMHdDFeP9gWLYNf70N6azJkCXSo7JKnL
+
+
+Heroku
+Ubuntu setup
+curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+heroku --version
+
+
+
+
+
+
+
