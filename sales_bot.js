@@ -17,7 +17,7 @@ const url = solanaWeb3.clusterApiUrl(process.env.SOLANA_ENV);
 const solanaConnection = new solanaWeb3.Connection(url, 'confirmed');
 const metaplexConnection = new Connection(process.env.SOLANA_ENV);
 const { metadata: { Metadata } } = programs;
-const pollingInterval = 5000; // ms
+const pollingInterval = 10000; // ms
 
 var currentDate = new Date();
 
