@@ -59,7 +59,7 @@ const runSalesBot = async () => {
                 await timer(pollingInterval);
                 continue;
             }
-            console.log(signatures);
+            //console.log(signatures);
 
         } catch (err) {
             console.log("error fetching signatures: ", err);
@@ -70,8 +70,8 @@ const runSalesBot = async () => {
             try {
                 let { signature } = signatures[i];
                 const txn = await solanaConnection.getTransaction(signature);
-                console.log("#Tran: " + signature);
-                console.log(txn);
+               //console.log("#Tran: " + signature);
+                //console.log(txn);
                 if (txn.meta && txn.meta.err != null) { continue; }
 
                 var nftDate = new Date(txn.blockTime * 1000);
@@ -80,9 +80,9 @@ const runSalesBot = async () => {
                 const accounts = txn.transaction.message.accountKeys;
                 const marketplaceAccount = accounts[accounts.length - 1].toString();
 
-                for (let k = accounts.length - 1; k >= 0; k--){
-                    console.log("account: " + accounts[k].toString());
-                }
+               // for (let k = accounts.length - 1; k >= 0; k--){
+               //     console.log("account: " + accounts[k].toString());
+               // }
                 
 
                 console.log("marketplaceAccount: " + marketplaceAccount);
