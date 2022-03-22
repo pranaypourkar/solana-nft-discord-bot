@@ -17,7 +17,7 @@ const url = solanaWeb3.clusterApiUrl(process.env.SOLANA_ENV);
 const solanaConnection = new solanaWeb3.Connection(url, 'confirmed');
 const metaplexConnection = new Connection(process.env.SOLANA_ENV);
 const { metadata: { Metadata } } = programs;
-const pollingInterval = 10000; // ms
+const pollingInterval = 1000; // ms
 
 var currentDate = new Date();
 
@@ -43,12 +43,20 @@ const marketplaceMap = {
     "cndy3Z4yapfJBmL3ShUp5exZKqR3z33thTzeNMm2gRZ" : "CM Mainnet",
 };
 
+const marketplaceImgMap = {
+    "M2mx93ekt1fmXSVkTrUL9xVFHkmME8HTUi5Cyc5aF7K": "https://i.postimg.cc/43p4WjZY/magiceden2.jpg",
+    "HZaWndaNWHFDd9Dhk5pqUUtsmoBCqzb1MLu3NAh1VX6B": "https://i.postimg.cc/135phc4R/Alpha-Art.png",
+    "617jbWo616ggkDxvW1Le8pV38XLbVSyWY8ae6QUmGBAU": "https://i.postimg.cc/Zqmz5ntq/Solsea.jpg",
+    "CJsLwbP1iu5DuUikHEJnLfANgKy6stB2uFgvBBHoyxwz": "https://i.postimg.cc/1XdZmKsx/solanart.png",
+};
+
+
 const runSalesBot = async () => {
     console.log("starting sales bot...");
 
     let signatures;
     let lastKnownSignature;
-    const options = {};
+    const options = {limit: 1};
     while (true) {
         try {
             //getSignaturesForAddress returns transactions in order of descending time
@@ -59,7 +67,7 @@ const runSalesBot = async () => {
                 await timer(pollingInterval);
                 continue;
             }
-            //console.log(signatures);
+            console.log(signatures);
 
         } catch (err) {
             console.log("error fetching signatures: ", err);
@@ -70,8 +78,8 @@ const runSalesBot = async () => {
             try {
                 let { signature } = signatures[i];
                 const txn = await solanaConnection.getTransaction(signature);
-               //console.log("#Tran: " + signature);
-                //console.log(txn);
+                //console.log("#Tran: " + signature);
+                console.log(txn);
                 if (txn.meta && txn.meta.err != null) { continue; }
 
                 var nftDate = new Date(txn.blockTime * 1000);
@@ -80,12 +88,12 @@ const runSalesBot = async () => {
                 const accounts = txn.transaction.message.accountKeys;
                 const marketplaceAccount = accounts[accounts.length - 1].toString();
 
-               // for (let k = accounts.length - 1; k >= 0; k--){
-               //     console.log("account: " + accounts[k].toString());
-               // }
+                //for (let k = accounts.length - 1; k >= 0; k--){
+                //    console.log("account: " + accounts[k].toString());
+                //}
                 
 
-                console.log("marketplaceAccount: " + marketplaceAccount);
+                //console.log("marketplaceAccount: " + marketplaceAccount);
 
                 if (marketplaceMap[marketplaceAccount]) {
                     //console.log("Supported marketplace sale");
@@ -95,17 +103,19 @@ const runSalesBot = async () => {
                         continue;
                     }
                     
-                    /*
-                    if(currentDate.valueOf() <= nftDate.valueOf() ) {
+                    console.log(metadata);
+                    console.log("Current Date: " + currentDate.getDate());
+                    console.log("NFT Date: " + nftDate.getDate());
+                    /*if(currentDate.valueOf() <= nftDate.valueOf() ) {
                         console.log("Supported marketplace sale");
-                        console.log("Current Date " + currentDate.getDate());
-                        console.log("NFT Date" + nftDate.getDate());
+                        //console.log("Current Date " + currentDate.getDate());
+                        //console.log("NFT Date" + nftDate.getDate());
                         printSalesInfo(dateString, price, signature, metadata.name, marketplaceMap[marketplaceAccount], metadata.image);
-                        await postSaleToDiscord(metadata.name, price, dateString, signature, metadata.image)
+                        await postSaleToDiscord(metadata.name, price, dateString, signature, metadata.image,marketplaceMap[marketplaceAccount])
                     }*/
 
                     printSalesInfo(dateString, price, signature, metadata.name, marketplaceMap[marketplaceAccount], metadata.image);
-                    await postSaleToDiscord(metadata.name, price, dateString, signature, metadata.image)
+                    await postSaleToDiscord(metadata.name, price, metadata.description, signature, metadata.image,marketplaceMap[marketplaceAccount],marketplaceImgMap[marketplaceAccount])
                 } else {
                     console.log("not a supported marketplace sale");
                 }
@@ -147,22 +157,29 @@ const getMetadata = async (tokenPubKey) => {
     }
 }
 
-const postSaleToDiscord = (title, price, date, signature, imageURL) => {
+const postSaleToDiscord = (title, price, description, signature, imageURL,marketplace,marketplaceImgUrl) => {
     axios.post(process.env.DISCORD_URL,
         {
             "embeds": [
                 {
                     "title": `SALE`,
                     "description": `${title}`,
+                    "thumbnail": {
+                        url: `${marketplaceImgUrl}`,
+                    },
                     "fields": [
+                        {
+                            name: 'Description',
+                            value: `${description}`,
+                        },
                         {
                             "name": "Price",
                             "value": `${price} SOL`,
                             "inline": true
                         },
                         {
-                            "name": "Date",
-                            "value": `${date}`,
+                            "name": "Marketplace",
+                            "value": `${marketplace}`,
                             "inline": true
                         },
                         {
